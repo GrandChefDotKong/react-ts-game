@@ -11,7 +11,25 @@ function App() {
   });
 
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
+  let hasLost, hasWon = false;
 
+  const incorrectLetters = guessedLetters.filter((letter) => !wordToGuess.includes(letter));
+  const checkIfWon = (letter: string) => guessedLetters.includes(letter);    
+
+  const initializeGame = () => {
+    setWordToGuess(words[Math.floor(Math.random() * words.length)]);
+    setGuessedLetters([]);
+    hasLost = hasWon = false;
+  }
+  
+
+  if(incorrectLetters.length >= 6) {
+    hasLost = true;
+  }
+
+  if(wordToGuess.split("").every(checkIfWon)) {
+    hasWon = true;
+  }
 
   return (
     <div style={{
@@ -23,15 +41,21 @@ function App() {
       alignItems: 'center',
     }}>
       <div style={{ fontSize: '2rem', textAlign: 'center' }}>
-        Lose Win
+        { hasLost && <span> You lost ... the word to guess was {wordToGuess}</span> }
+        { hasWon && <span> You win ... in {guessedLetters.length} guesses !</span> }
       </div>
-      <HangManDrawing />
-      <HangManWord word={wordToGuess} guessedLetters={guessedLetters} />
+      <HangManDrawing incorrectGuesses={incorrectLetters.length} />
+      <HangManWord wordToGuess={wordToGuess} guessedLetters={guessedLetters} />
       <div style={{ alignSelf: 'stretch' }}>
-        <Keyboard />
+        { !hasLost && !hasWon && (
+          <Keyboard wordToGuess={wordToGuess} guessedLetters={guessedLetters} setGuessedLetters={setGuessedLetters} />
+        )}
       </div>
-      
-
+      <div>{(hasLost || hasWon) && (
+        <button style={{ cursor: 'pointer', background: 'none', padding: '0.5em', fontSize: '2rem' }} onClick={initializeGame}>
+          { hasLost ? 'Try Again' : 'Restart'}
+        </button>
+      )}</div>
     </div>
   )
 }

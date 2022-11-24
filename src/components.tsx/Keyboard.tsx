@@ -30,7 +30,18 @@ const KEYS = [
   "z",
 ]
 
-const Keyboard = () => {
+type KeyboardProps = {
+  guessedLetters: string[],
+  setGuessedLetters: (letters: string[]) => void,
+  wordToGuess: string,
+}
+
+const Keyboard = ({ wordToGuess, guessedLetters, setGuessedLetters }: KeyboardProps) => {
+
+  const handleClick = (key: string) => {
+    setGuessedLetters([...guessedLetters, key])
+  }
+
   return (
     <div style={{ 
       display: 'grid', 
@@ -39,7 +50,9 @@ const Keyboard = () => {
     }}>
       { KEYS.map(key => {
         return <button 
-          className={`${styles.btn}`}
+          className={`${styles.btn} ${guessedLetters.includes(key) ? wordToGuess.includes(key) ? styles.active : styles.inactive : '' }`}
+          onClick={() => handleClick(key)}
+          disabled={guessedLetters.includes(key)}
           key={key}
         >
           { key.toUpperCase() }
